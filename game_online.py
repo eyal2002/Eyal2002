@@ -12,7 +12,7 @@ def sock_setup(other_ip):
     :param other_ip:
     :return my_sock:
     """
-    if input('client - c / server - s') == 'c':
+    if input('client - c / server - s\n') == 'c':
         print(other_ip)
         # server_ip = other_ip
         server_ip = '172.20.5.12'
@@ -21,7 +21,7 @@ def sock_setup(other_ip):
         return my_sock
     else:
         ser_sock = socket.socket()
-        ser_sock.bind(('172.20.5.12', 8820))
+        ser_sock.bind(('192.168.1.22', 8820))
         ser_sock.listen(10)
         (my_sock, client_address) = ser_sock.accept()
 
@@ -41,13 +41,11 @@ def game_on():
 def print_score(scr, score):
     """
     Prints your score to the screen
-    :param scr - unables the function to print to the game screen
+    :param scr - enables the function to print to the game screen
     :param score - the players score to build
     :return:
     """
     white = (255, 255, 255)
-    green = (0, 255, 0)
-    blue = (0, 0, 128)
     pygame.display.set_caption('Show Text')
     font = pygame.font.Font('freesansbold.ttf', 16)
     text = font.render(str(score), True, white)
@@ -77,7 +75,7 @@ def en_hit(shots, enemies, boom, scr, dmg):
     return sc_ta
 
 
-def get_pos(): 
+def get_pos():
     """
     Returns the position of the mouse courser.
     """
@@ -89,11 +87,13 @@ def return_of_the_chicken(sock):
     """
     main game function
     """
+    # ==============================================================================================================
     # Game setup
+    # ==============================================================================================================
     pygame.init()
     clock = pygame.time.Clock()
     scr = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption('Game_2')
+    pygame.display.set_caption('Return Of The Chickens')
     pygame.display.set_icon(pygame.image.load(r'C:\PY\PR\img\SP_tr.png'))
     pygame.mouse.set_visible(1)
 
@@ -122,18 +122,20 @@ def return_of_the_chicken(sock):
     score = 0
 
     # ==============================================================================================================
+    # Main Game function
     # ==============================================================================================================
 
-    # Main Game function
     while run:
         clock.tick(60)
-        run = game_on()
+        if not game_on():
+            sock.send(b'exit')
+            break
 
         # get the position
         pos = get_pos()
 
         # Shots
-        if pygame.mouse.get_pressed()[0] == 1 and shot_delay == 0 and False:
+        if pygame.mouse.get_pressed()[0] == 1 and shot_delay == 0:
             c_s = 22
             shot_delay = shot_amount
             if sh_lv < 4:
@@ -162,33 +164,71 @@ def return_of_the_chicken(sock):
             shot_delay -= 1
 
         # print(shots)
-        print(pos)
+        # print(pos)
 
+        to_remove = []
+        print(shots)
         try:
-            # for i in shots:
-            if shots[0][0] <= 0:
-                if len(shots) != 1:
-                    shots = shots[1:]
+            for shot in shots:
+                if shot[0] <= 0 or shot[2] < -30:
+                    to_remove.append(shot)
                 else:
-                    shots = []
+                    break
+            for rem in to_remove:
+                shots.remove(rem)
         except IndexError:
             shots = []
+        print('=================================')
+        print(shots)
 
         scr.fill((0, 0, 0))
         scr.blit(b_g, (0, 0))
 
+        # builds your shots
         for i in shots:
             scr.blit(ls[sh_lv % 4], (i[1], i[2]))
+
+        # organize the data
+
+        # my shots data organizer
+        shot_send = ''.join(['{0} {1} {2},'.format(sh_lv, sh[1], sh[2]) for sh in shots])[:-1]
+        if shot_send == '':
+            shot_send = 'empty'
+
+        # my position data organizer
+        pos_send = '{0} {1}'.format(pos[0], pos[1])
+
+        # final preparation for transmission
+        data = '{0}:{1}'.format(pos_send, shot_send)
+
+        # sends and receives transmission
+        sock.send(data.encode())
+        data = sock.recv(1024).decode()
+
+        # handles the received data
+        if data == 'exit':
+            break
+        data = data.split(':')
+        # print(data)
+        pos_send = data[0]
+        shot_send = data[1]
+
+        # handles and print the other players shots
+        if shot_send != 'empty':
+            shot_send = shot_send.split(',')
+            shot_send = [i.split() for i in shot_send]
+            for i in shot_send:
+                scr.blit(ls[int(i[0]) % 4], (int(i[1]), int(i[2])))
 
         for i in enemies:
             if i[0] > 0:
                 scr.blit(enemy, (i[1], i[2]))
 
+        # builds your and the other players ship
         scr.blit(sp_tr, pos)
-        sock.send(b'' + str(pos[0]).encode() + b' ' + str(pos[1]).encode())
-        al_pos = sock.recv(1024).decode().split()
-        al_pos = (int(al_pos[0]), int(al_pos[1]))
-        scr.blit(sp_tr, al_pos)
+        pos_send = pos_send.split()
+        pos_send = (int(pos_send[0]), int(pos_send[1]))
+        scr.blit(sp_tr, pos_send)
 
         score += en_hit(shots, enemies, boom, scr, dmg)
         pygame.display.update()

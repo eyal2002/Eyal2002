@@ -86,6 +86,8 @@ def return_of_the_chicken():
     enemies = [[1000, 350, 160, 44, 32]]
     sh_lv = 11
     score = 0
+    num = 0
+    to_remove = []
 
     # ==============================================================================================================
     # ==============================================================================================================
@@ -128,16 +130,19 @@ def return_of_the_chicken():
             shot_delay -= 1
 
         print(shots)
-
+        to_remove = []
         try:
-            # for i in shots:
-            if shots[0][0] <= 0:
-                if len(shots) != 1:
-                    shots = shots[1:]
+            for shot in shots:
+                if shot[0] <= 0 or shot[2] < -30:
+                    to_remove.append(shot)
                 else:
-                    shots = []
+                    break
+            for rem in to_remove:
+                shots.remove(rem)
         except IndexError:
             shots = []
+        print('=================================')
+        print(shots)
 
         scr.fill((0, 0, 0))
         scr.blit(b_g, (0, 0))
