@@ -16,8 +16,6 @@ def game_on():
 
 def print_score(scr, score):
     white = (255, 255, 255)
-    green = (0, 255, 0)
-    blue = (0, 0, 128)
     pygame.display.set_caption('Show Text')
     font = pygame.font.Font('freesansbold.ttf', 16)
     text = font.render(str(score), True, white)
@@ -28,6 +26,8 @@ def en_hit(shots, enemies, boom, scr, dmg):
     """
     Checks if any shots hit an enemy
     """
+    print(boom)
+    print(scr)
     sc_ta = 0
     for enemy in enemies:
         for shot in shots:
@@ -86,8 +86,6 @@ def return_of_the_chicken():
     enemies = [[1000, 350, 160, 44, 32]]
     sh_lv = 11
     score = 0
-    num = 0
-    to_remove = []
 
     # ==============================================================================================================
     # ==============================================================================================================
