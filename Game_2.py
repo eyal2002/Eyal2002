@@ -26,20 +26,21 @@ def en_hit(shots, enemies, boom, scr, dmg):
     """
     Checks if any shots hit an enemy
     """
-    print(boom)
-    print(scr)
+    # print(boom)
+    # print(scr)
     sc_ta = 0
     for enemy in enemies:
+        en_hi_bx = pygame.Rect(enemy[1], enemy[2], enemy[3], enemy[4])
         for shot in shots:
             if enemy[0] > 0:
-                if shot[1] in range(enemy[1] - 8, enemy[1] + enemy[3]):
-                    if shot[2] in range(enemy[2] - 50, enemy[2] + enemy[4]):
-                        # scr.blit(boom, (enemy[1] - 20, enemy[2] - 20))
-                        shots.remove(shot)
-                        # pygame.mixer.music.load(r'C:\PY\PR\sound\explosion.mp3')
-                        # pygame.mixer.music.play(0)
-                        enemy[0] -= dmg
-                        sc_ta += 1
+                sh_ht_bx = pygame.Rect(shot[1], shot[2], 8, 50)
+                if en_hi_bx.colliderect(sh_ht_bx) == 1:
+                    # scr.blit(boom, (enemy[1] - 20, enemy[2] - 20))
+                    shots.remove(shot)
+                    # pygame.mixer.music.load(r'C:\PY\PR\sound\explosion.mp3')
+                    # pygame.mixer.music.play(0)
+                    enemy[0] -= dmg
+                    sc_ta += 1
     return sc_ta
 
 
@@ -127,7 +128,7 @@ def return_of_the_chicken():
         if shot_delay > 0:
             shot_delay -= 1
 
-        print(shots)
+        # print(shots)
         to_remove = []
         try:
             for shot in shots:
@@ -139,8 +140,8 @@ def return_of_the_chicken():
                 shots.remove(rem)
         except IndexError:
             shots = []
-        print('=================================')
-        print(shots)
+        # print('=================================')
+        # print(shots)
 
         scr.fill((0, 0, 0))
         scr.blit(b_g, (0, 0))
