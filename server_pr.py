@@ -131,7 +131,7 @@ def main():
     Add Documentation here
     """
     # server setup
-    ip_ad = '172.20.5.34'
+    ip_ad = '172.20.5.33'
     # ip_ad = '127.0.0.1'
     # ip_ad = '192.168.1.22'
     # ip_ad = '192.168.43.207'
@@ -145,12 +145,7 @@ def main():
     try:
         c.execute("CREATE TABLE users ([user_name] text primary key, [password] text, [socket] text, [friends] text)")
         conn.commit()
-    except:
-        print('table already exist')
-    try:
-        c.execute("CREATE TABLE games ([game_name] text primary key, [ip_reference] text, [picture_local] text)")
-        conn.commit()
-    except:
+    except sqlite3.OperationalError:
         print('table already exist')
 
     # varibles
