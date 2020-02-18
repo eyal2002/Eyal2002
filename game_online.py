@@ -3,7 +3,7 @@ import pygame as pg
 import socket
 # import sys
 # import random
-# C:\PY\PR\game_online.py
+# C:\PR\game_online.py
 
 
 def sock_setup(other_ip):
@@ -74,7 +74,7 @@ def en_hit(shots, enemies, boom, scr, dmg):
                 if en_hi_bx.colliderect(sh_ht_bx) == 1:
                     # scr.blit(boom, (enemy[1] - 20, enemy[2] - 20))
                     shots.remove(shot)
-                    # pg.mixer.music.load(r'C:\PY\PR\sound\explosion.mp3')
+                    # pg.mixer.music.load(r'C:\PR\sound\explosion.mp3')
                     # pg.mixer.music.play(0)
                     enemy[0] -= dmg
                     sc_ta += 1
@@ -100,18 +100,18 @@ def return_of_the_chicken(sock):
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
     pg.display.set_caption('Return Of The Chickens')
-    pg.display.set_icon(pg.image.load(r'C:\PY\PR\img\SP_tr.png'))
+    pg.display.set_icon(pg.image.load(r'C:\PR\img\SP_tr.png'))
     pg.mouse.set_visible(1)
 
     # Images
-    sp_tr = pg.image.load(r'C:\PY\PR\img\SPnn.png')
-    b_g = pg.image.load(r'C:\PY\PR\img\bg_2.jpg')
-    enemy = pg.image.load(r'C:\PY\PR\img\en_1.png')
-    boom = pg.image.load(r'C:\PY\PR\img\boom.png')
-    ls_g = pg.image.load(r'C:\PY\PR\img\laser_g.png')
-    ls_r = pg.image.load(r'C:\PY\PR\img\laser_r.png')
-    ls_b = pg.image.load(r'C:\PY\PR\img\laser_b.png')
-    ls_o = pg.image.load(r'C:\PY\PR\img\laser_o.png')
+    sp_tr = pg.image.load(r'C:\PR\img\SPnn.png')
+    b_g = pg.image.load(r'C:\PR\img\bg_2.jpg')
+    enemy = pg.image.load(r'C:\PR\img\en_1.png')
+    boom = pg.image.load(r'C:\PR\img\boom.png')
+    ls_g = pg.image.load(r'C:\PR\img\laser_g.png')
+    ls_r = pg.image.load(r'C:\PR\img\laser_r.png')
+    ls_b = pg.image.load(r'C:\PR\img\laser_b.png')
+    ls_o = pg.image.load(r'C:\PR\img\laser_o.png')
     ls = [ls_g, ls_r, ls_b, ls_o]
 
     pg.mouse.set_visible(False)
@@ -146,18 +146,18 @@ def return_of_the_chicken(sock):
             shot_delay = shot_amount
             if sh_lv < 4:
                 shots.append([c_s, pos[0] + 21, pos[1]])
-                # pg.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pg.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pg.mixer.music.play(0)
             elif sh_lv < 8:
                 shots.append([c_s, pos[0] + 13, pos[1]])
                 shots.append([c_s, pos[0] + 29, pos[1]])
-                # pg.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pg.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pg.mixer.music.play(0)
             else:
                 shots.append([c_s, pos[0] + 21, pos[1]])
                 shots.append([c_s, pos[0] + 39, pos[1]])
                 shots.append([c_s, pos[0] + 3, pos[1]])
-                # pg.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pg.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pg.mixer.music.play(0)
 
         if c_s > 0:

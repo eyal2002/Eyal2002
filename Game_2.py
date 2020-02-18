@@ -37,7 +37,7 @@ def en_hit(shots, enemies, boom, scr, dmg):
                 if en_hi_bx.colliderect(sh_ht_bx) == 1:
                     # scr.blit(boom, (enemy[1] - 20, enemy[2] - 20))
                     shots.remove(shot)
-                    # pygame.mixer.music.load(r'C:\PY\PR\sound\explosion.mp3')
+                    # pygame.mixer.music.load(r'C:\PR\sound\explosion.mp3')
                     # pygame.mixer.music.play(0)
                     enemy[0] -= dmg
                     sc_ta += 1
@@ -61,18 +61,18 @@ def return_of_the_chicken():
     clock = pygame.time.Clock()
     scr = pygame.display.set_mode((800, 600))
     pygame.display.set_caption('Game_2')
-    pygame.display.set_icon(pygame.image.load(r'C:\PY\PR\img\SP_tr.png'))
+    pygame.display.set_icon(pygame.image.load(r'C:\PR\img\SP_tr.png'))
     pygame.mouse.set_visible(1)
 
     # Images
-    sp_tr = pygame.image.load(r'C:\PY\PR\img\SPnn.png')
-    b_g = pygame.image.load(r'C:\PY\PR\img\bg_2.jpg')
-    enemy = pygame.image.load(r'C:\PY\PR\img\en_1.png')
-    boom = pygame.image.load(r'C:\PY\PR\img\boom.png')
-    ls_g = pygame.image.load(r'C:\PY\PR\img\laser_g.png')
-    ls_r = pygame.image.load(r'C:\PY\PR\img\laser_r.png')
-    ls_b = pygame.image.load(r'C:\PY\PR\img\laser_b.png')
-    ls_o = pygame.image.load(r'C:\PY\PR\img\laser_o.png')
+    sp_tr = pygame.image.load(r'C:\PR\img\SPnn.png')
+    b_g = pygame.image.load(r'C:\PR\img\bg_2.jpg')
+    enemy = pygame.image.load(r'C:\PR\img\en_1.png')
+    boom = pygame.image.load(r'C:\PR\img\boom.png')
+    ls_g = pygame.image.load(r'C:\PR\img\laser_g.png')
+    ls_r = pygame.image.load(r'C:\PR\img\laser_r.png')
+    ls_b = pygame.image.load(r'C:\PR\img\laser_b.png')
+    ls_o = pygame.image.load(r'C:\PR\img\laser_o.png')
     ls = [ls_g, ls_r, ls_b, ls_o]
 
     pygame.mouse.set_visible(False)
@@ -105,18 +105,18 @@ def return_of_the_chicken():
             shot_delay = shot_amount
             if sh_lv < 4:
                 shots.append([c_s, pos[0] + 21, pos[1]])
-                # pygame.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pygame.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pygame.mixer.music.play(0)
             elif sh_lv < 8:
                 shots.append([c_s, pos[0] + 13, pos[1]])
                 shots.append([c_s, pos[0] + 29, pos[1]])
-                # pygame.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pygame.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pygame.mixer.music.play(0)
             else:
                 shots.append([c_s, pos[0] + 21, pos[1]])
                 shots.append([c_s, pos[0] + 39, pos[1]])
                 shots.append([c_s, pos[0] + 3, pos[1]])
-                # pygame.mixer.music.load(r'C:\PY\PR\sound\ls_sound.mp3')
+                # pygame.mixer.music.load(r'C:\PR\sound\ls_sound.mp3')
                 # pygame.mixer.music.play(0)
 
         if c_s > 0:

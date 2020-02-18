@@ -2,7 +2,7 @@
 import socket
 import select
 import sqlite3
-# C:\PY\PR\server_pr.py
+# C:\PR\server_pr.py
 
 
 def send_waiting_messages(w_list):

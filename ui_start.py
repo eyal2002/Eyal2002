@@ -22,7 +22,7 @@ def log_in():
     font = pg.font.Font(None, 32)
     clock = pg.time.Clock()
     screen.fill((0, 0, 0))
-    op_scr = pg.image.load(r'C:\PY\PR\img\icon_5.jpg')
+    op_scr = pg.image.load(r'C:\PR\img\icon_5.jpg')
     screen.blit(op_scr, (0, 0))
     pg.display.update()
     clock.tick(0.5)
