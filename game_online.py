@@ -22,9 +22,7 @@ def sock_setup(other_ip):
         return my_sock
     else:
         ser_sock = socket.socket()
-        # ser_sock.bind(('192.168.1.22', 8820))
-        ser_sock.bind(('172.20.5.33', 8820))
-        # ser_sock.bind(('127.0.0.1', 8820))
+        ser_sock.bind((socket.gethostbyname(socket.gethostname()), 8820))
         ser_sock.listen(10)
         (my_sock, client_address) = ser_sock.accept()
 

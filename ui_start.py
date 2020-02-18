@@ -6,8 +6,8 @@ def print_txt(scr, txt, x, y):
     Prints your score to the screen
     :param scr - enables the function to print to the game screen
     :param txt - the players score to build
-    :param x - points to where is the text x posision is
-    :param y - points to where is the text y posision is
+    :param x - points to where is the text x poisson is
+    :param y - points to where is the text y poisson is
     :return:
     """
     white = (255, 255, 255)
@@ -86,7 +86,6 @@ def log_in():
                     if event.key == pg.K_BACKSPACE:
                         text_name = text_name[:-1]
                     elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)]:
-                        print(ord(event.unicode))
                         text_name += event.unicode
 
                 elif active_pass:

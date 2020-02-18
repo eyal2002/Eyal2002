@@ -131,12 +131,8 @@ def main():
     Add Documentation here
     """
     # server setup
-    ip_ad = '172.20.5.33'
-    # ip_ad = '127.0.0.1'
-    # ip_ad = '192.168.1.22'
-    # ip_ad = '192.168.43.207'
     ser_sock = socket.socket()
-    ser_sock.bind((ip_ad, 8820))
+    ser_sock.bind((socket.gethostbyname(socket.gethostname()), 8820))
     ser_sock.listen(1)
 
     # database setup
