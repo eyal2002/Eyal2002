@@ -59,7 +59,7 @@ def log_in():
                 # Checks if a button is pressed
                 elif button_login.collidepoint(event.pos[0], event.pos[1]):
                     print(text_name + ' ' + text_pass)
-                    # sends said information to the correct function
+                    # sends said information to the correct function.
                     # log_in(text_name, text_pass)
                     text_name = ''
                     text_pass = ''
