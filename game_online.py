@@ -15,15 +15,16 @@ def sock_setup(other_ip):
     if input('client - c / server - s\n') == 'c':
         print(other_ip)
         # server_ip = other_ip
-        # server_ip = '172.20.5.12'
-        server_ip = '127.0.0.1'
+        server_ip = '172.20.5.33'
+        # server_ip = '127.0.0.1'
         my_sock = socket.socket()
         my_sock.connect((server_ip, 8820))
         return my_sock
     else:
         ser_sock = socket.socket()
         # ser_sock.bind(('192.168.1.22', 8820))
-        ser_sock.bind(('127.0.0.1', 8820))
+        ser_sock.bind(('172.20.5.33', 8820))
+        # ser_sock.bind(('127.0.0.1', 8820))
         ser_sock.listen(10)
         (my_sock, client_address) = ser_sock.accept()
 
