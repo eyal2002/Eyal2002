@@ -100,8 +100,7 @@ def lo_data_handle(user_data):
     :param user_data:
     :return:
     """
-
-    print('aghgsd')
+    print('logged out handler')
     if user_data[3:5] == 'si':
         # directs to the sign in function.
         print('sing in function')

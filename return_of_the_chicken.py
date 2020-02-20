@@ -8,18 +8,19 @@ server_ip = socket.gethostbyname(socket.gethostname())
 # ============================================================================================================
 
 
-def print_txt(scr, txt, x, y):
+def print_txt(scr, txt, x, y, size):
     """
     Prints your score to the screen
     :param scr - enables the function to print to the game screen
     :param txt - the players score to build
     :param x - points to where is the text x poisson is
     :param y - points to where is the text y poisson is
+    :param size - the size of the font
     :return:
     """
     white = (255, 255, 255)
     pg.display.set_caption('Show Text')
-    font = pg.font.Font('freesansbold.ttf', 18)
+    font = pg.font.Font('freesansbold.ttf', size)
     text = font.render(str(txt), True, white)
     scr.blit(text, (x, y))
 
@@ -34,17 +35,17 @@ def stage_1(sock):
     Establishes a the connection with the server
     """
     # prints the game intro a few seconds.
-    screen = pg.display.set_mode((1064, 600))
+    scr = pg.display.set_mode((1064, 600))
     font = pg.font.Font(None, 32)
     clock = pg.time.Clock()
-    screen.fill((0, 0, 0))
+    scr.fill((0, 0, 0))
     op_scr = pg.image.load(r'C:\PR\img\icon_5.jpg')
-    screen.blit(op_scr, (0, 0))
+    scr.blit(op_scr, (0, 0))
     pg.display.update()
     clock.tick(0.5)
 
     # sets the display and variables for the process.
-    screen = pg.display.set_mode((640, 480))
+    scr = pg.display.set_mode((640, 480))
     input_box_name = pg.Rect(100, 100, 240, 32)
     input_box_pass = pg.Rect(140, 230, 240, 32)
     button_login = pg.Rect(165, 349, 83, 40)
@@ -125,16 +126,16 @@ def stage_1(sock):
         color_name = color_active if active_name else color_inactive
         color_pass = color_active if active_pass else color_inactive
 
-        screen.fill((30, 30, 30))
+        scr.fill((30, 30, 30))
         # Render the current text.
         txt_surface = font.render(text_name, True, color_name)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box_name.w = width
         # Blit the text.
-        screen.blit(txt_surface, (input_box_name.x + 5, input_box_name.y + 5))
+        scr.blit(txt_surface, (input_box_name.x + 5, input_box_name.y + 5))
         # Blit the input_box rect.
-        pg.draw.rect(screen, color_name, input_box_name, 2)
+        pg.draw.rect(scr, color_name, input_box_name, 2)
 
         # Render the current text.
         txt_surface = font.render(len(text_pass)*'*' if con_pass else text_pass, True, color_pass)
@@ -142,19 +143,19 @@ def stage_1(sock):
         width = max(200, txt_surface.get_width() + 10)
         input_box_pass.w = width
         # Blit the text.
-        screen.blit(txt_surface, (input_box_pass.x + 5, input_box_pass.y + 5))
+        scr.blit(txt_surface, (input_box_pass.x + 5, input_box_pass.y + 5))
         # Blit the input_box rect.
-        pg.draw.rect(screen, color_pass, input_box_pass, 2)
+        pg.draw.rect(scr, color_pass, input_box_pass, 2)
 
         # draws the text for the input boxes
-        print_txt(screen, 'User Name:', 100, 70)
-        print_txt(screen, 'Password:', 100, 200)
-        print_txt(screen, 'Log In', 180, 360)
-        print_txt(screen, 'Sign Up', 400, 360)
-        print_txt(screen, chr(164), 111, 238)
-        pg.draw.rect(screen, (255, 255, 255), button_login, 2)
-        pg.draw.rect(screen, (255, 255, 255), button_signup, 2)
-        pg.draw.rect(screen, color_inactive if con_pass else color_active, button_see_pass, 2)
+        print_txt(scr, 'User Name:', 100, 70, 18)
+        print_txt(scr, 'Password:', 100, 200, 18)
+        print_txt(scr, 'Log In', 180, 360, 18)
+        print_txt(scr, 'Sign Up', 400, 360, 18)
+        print_txt(scr, chr(164), 106, 231, 35)
+        pg.draw.rect(scr, (255, 255, 255), button_login, 2)
+        pg.draw.rect(scr, (255, 255, 255), button_signup, 2)
+        pg.draw.rect(scr, color_inactive if con_pass else color_active, button_see_pass, 2)
 
         pg.display.flip()
         clock.tick(60)
