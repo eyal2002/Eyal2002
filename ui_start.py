@@ -16,6 +16,7 @@ def print_txt(scr, txt, x, y, size):
     font = pg.font.Font('freesansbold.ttf', size)
     text = font.render(str(txt), True, white)
     scr.blit(text, (x, y))
+    # 1
 
 
 def log_in():
