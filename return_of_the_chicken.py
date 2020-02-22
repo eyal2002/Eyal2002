@@ -45,6 +45,7 @@ def stage_1(sock):
     clock.tick(0.5)
 
     # sets the display and variables for the process.
+    bg = pg.image.load(r'C:\PR\img\bg_6.jpg')
     scr = pg.display.set_mode((640, 480))
     input_box_name = pg.Rect(100, 100, 240, 32)
     input_box_pass = pg.Rect(140, 230, 240, 32)
@@ -52,7 +53,7 @@ def stage_1(sock):
     button_signup = pg.Rect(385, 349, 96, 40)
     button_see_pass = pg.Rect(100, 230, 32, 32)
     color_inactive = (200, 200, 255)
-    color_active = (90, 90, 255)
+    color_active = (130, 130, 255)
     active_name = False
     active_pass = False
     text_name = ''
@@ -126,7 +127,8 @@ def stage_1(sock):
         color_name = color_active if active_name else color_inactive
         color_pass = color_active if active_pass else color_inactive
 
-        scr.fill((30, 30, 30))
+        scr.fill((0, 0, 0))
+        scr.blit(bg, (0, 0))
         # Render the current text.
         txt_surface = font.render(text_name, True, color_name)
         # Resize the box if the text is too long.
@@ -169,8 +171,8 @@ def main():
     main function, calls the needed functions in order to anabel a correct run of the game
     """
     sock = socket.socket()
-    sock.connect((server_ip, 8820))
-    print(sock.recv(1024))
+    # sock.connect((server_ip, 8820))
+    # print(sock.recv(1024))
     stage_1(sock)
 
 
