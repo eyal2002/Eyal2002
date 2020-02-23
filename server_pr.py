@@ -30,7 +30,7 @@ def sign_up(user_data):
         conn = sqlite3.connect('PR_DB.db')
         c = conn.cursor()
         # tries to set a new user' if failing to do the username already exists
-        c.execute("INSERT INTO users VALUES ('" + data[0] + "','" + data[1] + "','" + '' + "','" + '' + "')")
+        c.execute("INSERT INTO users VALUES ('{0}', '{1}', '1', '1', '')".format(data[0], data[1]))
         conn.commit()
         # prints the current users table
         c.execute("SELECT * FROM users")
@@ -40,7 +40,7 @@ def sign_up(user_data):
         current_socket.send(b'success')
         print('yes')
         activate_user(data[0])
-    except:
+    except sqlite3.IntegrityError:
         current_socket.send(b'fail')
         print('no')
 
@@ -66,7 +66,7 @@ def sign_in(user_data):
         else:
             print('no')
             current_socket.send(b'fail')
-    except:
+    except IndexError:
         print('no')
         current_socket.send(b'fail')
 
@@ -81,7 +81,7 @@ def activate_user(user_name):
     name_to_sock[user_name] = current_socket
 
 
-def disactivate_user():
+def deactivate_user():
     """
     removes a user who singed out or disconnected from being an active user.
     :param:
@@ -122,7 +122,26 @@ def li_data_handle(user_data):
     :param user_data:
     :return:
     """
-    pass
+    data = user_data[3:].split(':')
+    command = data[0]
+    data = data[1]
+    conn = sqlite3.connect('PR_DB.db')
+    c = conn.cursor()
+    if command == 'set_custom':
+        data = data.split
+        c.execute("UPDATE users SET spaceship = {0}, shot = {1} "
+                  "Where user_name = {2}".format(data[0], data[1], sock_to_name.get(current_socket)))
+    if command == 'get_custom':
+        c.execute("SELECT spaceship, shot FROM users WHERE user_name == '{0}'"
+                  "".format(sock_to_name.get(str(current_socket))))
+        ts = c.fetchall()[0]
+        current_socket.send('{0} {1}'.format(ts[0], ts[1]).encode())
+        print('sent')
+
+    if command == '':
+        pass
+    if command == '':
+        pass
 
 
 def main():
@@ -138,7 +157,8 @@ def main():
     conn = sqlite3.connect('PR_DB.db')
     c = conn.cursor()
     try:
-        c.execute("CREATE TABLE users ([user_name] text primary key, [password] text, [socket] text, [friends] text)")
+        c.execute("CREATE TABLE users ([user_name] text primary key, [password] text, [spaceship] txt,"
+                  " [shot] txt, [friends] text)")
         conn.commit()
     except sqlite3.OperationalError:
         print('table already exist')
@@ -173,10 +193,10 @@ def main():
                             lo_data_handle(data)
 
                         # handles data of a logged in user, li => logged in
-                        if data[:2] == 'li':
+                        elif data[:2] == 'li':
                             li_data_handle(data)
 
-                        if data == 'exit':
+                        elif data == 'exit':
                             open_client_sockets.remove(current_socket)
                             current_socket.send(b'disconnected')
 
@@ -185,7 +205,7 @@ def main():
 
                     except ConnectionResetError:
                         print('disconnected')
-                        disactivate_user()
+                        deactivate_user()
                     except:
                         raise
         except:

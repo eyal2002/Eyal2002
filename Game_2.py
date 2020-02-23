@@ -65,7 +65,7 @@ def return_of_the_chicken():
     pygame.mouse.set_visible(1)
 
     # Images
-    sp_tr = pygame.image.load(r'C:\PR\img\SPnn.png')
+    sp_tr = pygame.image.load(r'C:\PR\img\SP_1.png')
     b_g = pygame.image.load(r'C:\PR\img\bg_2.jpg')
     enemy = pygame.image.load(r'C:\PR\img\en_1.png')
     boom = pygame.image.load(r'C:\PR\img\boom.png')

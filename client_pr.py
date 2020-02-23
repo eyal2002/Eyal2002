@@ -12,7 +12,7 @@ def main():
     server_ip = '127.0.0.1'
     # server_ip = '192.168.43.207'
     cli_socket = socket.socket()
-    cli_socket.connect((server_ip, 8820))
+    cli_socket.connect((socket.gethostbyname(socket.gethostname()), 8820))
     print(cli_socket.recv(1024))
     while True:
         data = input('msg to server\n')

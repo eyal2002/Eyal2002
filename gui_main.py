@@ -121,6 +121,30 @@ def stage_2_custom():
         clock.tick(60)
 
 
+def stage_2_rules():
+    clock = pg.time.Clock()
+    scr = pg.display.set_mode((800, 600))
+
+    # variables
+    done = False
+    bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
+                    done = True
+
+        # prints a return sign
+        pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
+        pg.draw.rect(scr, (0, 0, 0), pg.Rect(0, 0, 80, 40), 5)
+        print_txt(scr, 'Return', 7, 12, 20)
+        pg.display.flip()
+        clock.tick(60)
+
+
 def stage_2_main():
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
@@ -220,6 +244,7 @@ def main():
     # print(sock.recv(1024))
     stage_2_main()
     stage_2_custom()
+
 
 if __name__ == '__main__':
     pg.init()
