@@ -3,6 +3,12 @@ import socket
 import select
 import sqlite3
 # C:\PR\server_pr.py
+open_client_sockets = []
+messages_to_send = []
+name_to_sock = {}
+sock_to_name = {}
+in_game_users = []
+current_socket = socket.socket()
 
 
 def send_waiting_messages(w_list):
@@ -66,7 +72,8 @@ def sign_in(user_data):
         else:
             print('no')
             current_socket.send(b'fail')
-    except IndexError:
+    except:
+        raise
         print('no')
         current_socket.send(b'fail')
 
@@ -108,7 +115,7 @@ def lo_data_handle(user_data):
 
     if user_data[3:5] == 'su':
         # directs to the sign up function.
-        print('sing in function')
+        print('sing up function')
         sign_up(user_data)
 
     if user_data[3:5] == 'rq':
@@ -122,26 +129,65 @@ def li_data_handle(user_data):
     :param user_data:
     :return:
     """
+    # Organizes the data and prepare the access to the data base
+    print('logged in handler')
     data = user_data[3:].split(':')
     command = data[0]
     data = data[1]
     conn = sqlite3.connect('PR_DB.db')
     c = conn.cursor()
+    print(command)
+
+    # sets the players active load-out
     if command == 'set_custom':
-        data = data.split
-        c.execute("UPDATE users SET spaceship = {0}, shot = {1} "
-                  "Where user_name = {2}".format(data[0], data[1], sock_to_name.get(current_socket)))
-    if command == 'get_custom':
+        data = data.split()
+        c.execute("UPDATE users SET spaceship = '{0}', shot = '{1}' "
+                  "WHERE user_name == '{2}'".format(data[0], data[1], sock_to_name.get(str(current_socket))))
+        conn.commit()
+        current_socket.send(b'done')
+        print('sent')
+
+    # sends the users active load-out
+    elif command == 'get_custom':
         c.execute("SELECT spaceship, shot FROM users WHERE user_name == '{0}'"
                   "".format(sock_to_name.get(str(current_socket))))
         ts = c.fetchall()[0]
         current_socket.send('{0} {1}'.format(ts[0], ts[1]).encode())
         print('sent')
 
-    if command == '':
-        pass
-    if command == '':
-        pass
+    elif command == 'get_friends':
+        a_u = name_to_sock.keys()
+        c.execute("SELECT friends FROM users WHERE user_name == '{0}'".format(sock_to_name.get(str(current_socket))))
+        my_friends = c.fetchall()[0][0][:-1]
+        fig = ''
+        fil = ''
+        connected_users = [sock_to_name.get(user) for user in open_client_sockets]
+        for friend in my_friends.split():
+            if friend in connected_users:
+                if friend in in_game_users:
+                    fig += friend
+                else:
+                    fil += friend
+        print('my friends: ' + my_friends)
+        current_socket.send('{0}:{1}:{2}'.format(my_friends, fil, fig).encode())
+
+    elif command == 'add_friend':
+        c.execute("SELECT friends FROM users WHERE user_name == '{0}'".format(sock_to_name.get(str(current_socket))))
+        my_friends = c.fetchall()
+        print(my_friends)
+        my_friends = my_friends[0][0]
+        if data not in my_friends.split() or True:
+            print('a')
+            c.execute("UPDATE users SET friends = '{0}' WHERE user_name == '{1}'"
+                      "".format(my_friends + data + ' ', sock_to_name.get(str(current_socket))))
+            conn.commit()
+            print('done')
+            current_socket.send(b'done')
+
+    elif command == 'get_c_user':
+        msg = ' '.join([name for name in name_to_sock.keys()])
+        print(msg)
+        current_socket.send(msg)
 
 
 def main():
@@ -163,9 +209,10 @@ def main():
     except sqlite3.OperationalError:
         print('table already exist')
 
-    # varibles
-    global messages_to_send, name_to_sock, sock_to_name, open_client_sockets, current_socket
+    # variables
+    global messages_to_send, name_to_sock, sock_to_name, open_client_sockets, current_socket, in_game_users
     open_client_sockets = []
+    in_game_users = []
     messages_to_send = []
     name_to_sock = {}
     sock_to_name = {}

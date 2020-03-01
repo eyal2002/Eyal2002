@@ -127,6 +127,7 @@ def stage_2_rules():
 
     # variables
     done = False
+    page = 1
     bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
 
     while not done:
@@ -139,8 +140,82 @@ def stage_2_rules():
 
         # prints a return sign
         pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
-        pg.draw.rect(scr, (0, 0, 0), pg.Rect(0, 0, 80, 40), 5)
+        pg.draw.rect(scr, (200, 200, 200), pg.Rect(0, 0, 80, 40), 5)
         print_txt(scr, 'Return', 7, 12, 20)
+
+        pg.draw.line(scr, (120, 120, 120), (310, 570), (390, 570), 40)
+        pg.draw.rect(scr, (200, 200, 200), pg.Rect(310, 550, 80, 40), 5)
+        print_txt(scr, 'Next', 332, 562, 16)
+
+        pg.draw.line(scr, (120, 120, 120), (410, 570), (490, 570), 40)
+        pg.draw.rect(scr, (200, 200, 200), pg.Rect(410, 550, 80, 40), 5)
+        print_txt(scr, 'Previous', 415, 562, 16)
+        pg.display.flip()
+        clock.tick(60)
+
+
+def stage_2_friends():
+    clock = pg.time.Clock()
+    scr = pg.display.set_mode((800, 600))
+
+    # variables
+    done = False
+    font = pg.font.Font(None, 32)
+    active = False
+    text_friend = ''
+    input_box = pg.Rect(400, 100, 340, 32)
+    color_inactive = (120, 120, 255)
+    color_active = (90, 90, 255)
+    bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+
+    friends = ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e']
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
+                    done = True
+                if input_box.collidepoint(event.pos[0], event.pos[1]):
+                    active = not active
+                else:
+                    active = False
+            if event.type == pg.KEYDOWN:
+                if active:
+                    if event.key == pg.K_BACKSPACE:
+                        text_friend = text_friend[:-1]
+                    elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)]:
+                        text_friend += event.unicode
+
+        scr.blit(bg, (0, 0))
+        # prints a return sign
+        pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
+        pg.draw.rect(scr, (200, 200, 200), pg.Rect(0, 0, 80, 40), 5)
+        print_txt(scr, 'Return', 7, 12, 20)
+
+        print_txt(scr, 'My Friends', 38, 58, 20)
+        pg.draw.rect(scr, (200, 200, 200), (30, 50, 200, 506), 4)
+        pg.draw.line(scr, (200, 200, 200), (30, 85), (230, 85), 4)
+
+        txt_surface = font.render(text_friend, True, color_active if active else color_inactive)
+        # Resize the box if the text is too long.
+        width = max(340, txt_surface.get_width() + 10)
+        input_box.w = width
+        pg.draw.line(scr, (170, 170, 170), (400, 116), (400 + max(340, txt_surface.get_width() + 10), 116), 32)
+        # Blit the text.
+        scr.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pg.draw.rect(scr, color_active if active else color_inactive, input_box, 2)
+
+        base_height = 91
+
+        for friend in friends:
+            if base_height <= 550:
+                print_txt(scr, friend, 39, base_height, 18)
+                pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
+                base_height += 26
+
         pg.display.flip()
         clock.tick(60)
 
@@ -188,10 +263,10 @@ def stage_2_main():
                     print('game')
 
                 elif rect_friends.collidepoint(event.pos[0], event.pos[1]):
-                    print('friends')
+                    stage_2_friends()
 
                 elif rect_rules.collidepoint(event.pos[0], event.pos[1]):
-                    print('rules')
+                    stage_2_rules()
 
                 elif pg.Rect(195, 52, 29, 29).collidepoint(event.pos[0], event.pos[1]):
                     print('refresh')

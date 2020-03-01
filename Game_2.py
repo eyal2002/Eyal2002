@@ -66,6 +66,7 @@ def return_of_the_chicken():
 
     # Images
     sp_tr = pygame.image.load(r'C:\PR\img\SP_1.png')
+    sp_tr = pygame.image.load(r'C:\PR\img\SP_7.png')
     b_g = pygame.image.load(r'C:\PR\img\bg_2.jpg')
     enemy = pygame.image.load(r'C:\PR\img\en_1.png')
     boom = pygame.image.load(r'C:\PR\img\boom.png')
@@ -74,6 +75,7 @@ def return_of_the_chicken():
     ls_b = pygame.image.load(r'C:\PR\img\laser_b.png')
     ls_o = pygame.image.load(r'C:\PR\img\laser_o.png')
     ls = [ls_g, ls_r, ls_b, ls_o]
+    ls_tp = pygame.image.load(r'C:\PR\img\laser_ro.png')
 
     pygame.mouse.set_visible(False)
 
@@ -149,7 +151,7 @@ def return_of_the_chicken():
         # Build the game grid
 
         for i in shots:
-            scr.blit(ls[sh_lv % 4], (i[1], i[2]))
+            scr.blit(ls_tp, (i[1], i[2]))
 
         for i in enemies:
             if i[0] > 0:
