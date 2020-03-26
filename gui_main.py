@@ -167,7 +167,9 @@ def stage_2_friends():
     color_inactive = (120, 120, 255)
     color_active = (90, 90, 255)
     bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+    search = pg.image.load(r'C:\PR\img\search.png')
 
+    # need to build a function that get text from the server and convert it to a list.
     friends = ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e']
 
     while not done:
@@ -208,8 +210,12 @@ def stage_2_friends():
         # Blit the input_box rect.
         pg.draw.rect(scr, color_active if active else color_inactive, input_box, 2)
 
+        # Blit the search icon
+        scr.blit(search, (750, 100))
+
         base_height = 91
 
+        # prints an builds the friends and the grid.
         for friend in friends:
             if base_height <= 550:
                 print_txt(scr, friend, 39, base_height, 18)
@@ -318,7 +324,6 @@ def main():
     # sock.connect((server_ip, 8820))
     # print(sock.recv(1024))
     stage_2_main()
-    stage_2_custom()
 
 
 if __name__ == '__main__':

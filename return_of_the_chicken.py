@@ -52,8 +52,8 @@ def stage_1(sock):
     button_login = pg.Rect(165, 349, 83, 40)
     button_signup = pg.Rect(385, 349, 96, 40)
     button_see_pass = pg.Rect(100, 230, 32, 32)
-    color_inactive = (200, 200, 255)
-    color_active = (130, 130, 255)
+    color_inactive = (240, 240, 255)
+    color_active = (170, 170, 255)
     active_name = False
     active_pass = False
     text_name = ''
@@ -114,13 +114,13 @@ def stage_1(sock):
                 elif active_name:
                     if event.key == pg.K_BACKSPACE:
                         text_name = text_name[:-1]
-                    elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)]:
+                    elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)] and len(text_pass) <= 25:
                         text_name += event.unicode
 
                 elif active_pass:
                     if event.key == pg.K_BACKSPACE:
                         text_pass = text_pass[:-1]
-                    elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)]:
+                    elif event.unicode not in [' ', ':', '\n', pg.K_RETURN, chr(13)] and len(text_pass) <= 35:
                         text_pass += event.unicode
 
         # Change the current color of the input box.
@@ -129,21 +129,28 @@ def stage_1(sock):
 
         scr.fill((0, 0, 0))
         scr.blit(bg, (0, 0))
+
+        # Password text
         # Render the current text.
         txt_surface = font.render(text_name, True, color_name)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box_name.w = width
+        # draws a line under the text for better visibility
+        pg.draw.line(scr, (170, 170, 170), (100, 116), (100 + max(200, txt_surface.get_width() + 10), 116), 32)
         # Blit the text.
         scr.blit(txt_surface, (input_box_name.x + 5, input_box_name.y + 5))
         # Blit the input_box rect.
         pg.draw.rect(scr, color_name, input_box_name, 2)
 
+        # Password text
         # Render the current text.
         txt_surface = font.render(len(text_pass)*'*' if con_pass else text_pass, True, color_pass)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box_pass.w = width
+        # draws a line under the text for better visibility
+        pg.draw.line(scr, (170, 170, 170), (140, 246), (140 + max(200, txt_surface.get_width() + 10), 246), 32)
         # Blit the text.
         scr.blit(txt_surface, (input_box_pass.x + 5, input_box_pass.y + 5))
         # Blit the input_box rect.

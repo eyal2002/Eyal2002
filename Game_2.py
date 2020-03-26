@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pygame
 # import sys
-# import random
+import random
 
 
 def game_on():
@@ -86,7 +86,8 @@ def return_of_the_chicken():
     shot_amount = 8
     shots = []
     dmg = 10
-    enemies = [[1000, 350, 160, 44, 32]]
+    # enemies [0 - hp points, 1 - x,2 -  y, 3 - length, 4 - high, 5 - (x, y) heading, 6 - speed, 7 - shot chance]
+    enemies = [[1000, 350, 160, 44, 32, (0, 0), 5, 0.5]]
     sh_lv = 11
     score = 0
 
@@ -144,6 +145,20 @@ def return_of_the_chicken():
             shots = []
         # print('=================================')
         # print(shots)
+
+        # enemies movement
+        for i in enemies:
+            vec = (i[5][0] - i[1], i[5][1] - i[2])
+            if vec == (0, 0):
+                i[5] = random.randint(10, 750), random.randint(5, 400)
+            else:
+                try:
+                    ratio = min(abs(round(5/((vec[0]**2 + vec[1]**2)**0.5), 3)), 1)
+                    vec = (i[1] + round(vec[0]*ratio), i[2] + round(vec[1]*ratio))
+                except ZeroDivisionError:
+                    pass
+                i[1], i[2] = vec
+            print(vec)
 
         scr.fill((0, 0, 0))
         scr.blit(b_g, (0, 0))
