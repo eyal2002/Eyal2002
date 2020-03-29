@@ -179,10 +179,13 @@ def stage_2_friends():
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
                     done = True
+                if pg.Rect(750, 100, 32, 32).collidepoint(event.pos[0], event.pos[1]):
+                    print('search')
                 if input_box.collidepoint(event.pos[0], event.pos[1]):
                     active = not active
                 else:
                     active = False
+
             if event.type == pg.KEYDOWN:
                 if active:
                     if event.key == pg.K_BACKSPACE:

@@ -44,6 +44,15 @@ def en_hit(shots, enemies, boom, scr, dmg):
     return sc_ta
 
 
+def dup_en(en):
+    """
+    creates a duplicate of a type of an enemy.
+    """
+    to_ret = [en[0], random.randint(10, 750), -20, en[3], en[4], (0, 50), en[6], en[7], en[8]]
+    to_ret[5] = to_ret[1], 60
+    return to_ret
+
+
 def get_pos():
     """
     Returns the position of the mouse courser.
@@ -68,7 +77,6 @@ def return_of_the_chicken():
     sp_tr = pygame.image.load(r'C:\PR\img\SP_1.png')
     sp_tr = pygame.image.load(r'C:\PR\img\SP_7.png')
     b_g = pygame.image.load(r'C:\PR\img\bg_2.jpg')
-    enemy = pygame.image.load(r'C:\PR\img\en_1.png')
     boom = pygame.image.load(r'C:\PR\img\boom.png')
     ls_g = pygame.image.load(r'C:\PR\img\laser_g.png')
     ls_r = pygame.image.load(r'C:\PR\img\laser_r.png')
@@ -86,8 +94,14 @@ def return_of_the_chicken():
     shot_amount = 8
     shots = []
     dmg = 10
-    # enemies [0 - hp points, 1 - x,2 -  y, 3 - length, 4 - high, 5 - (x, y) heading, 6 - speed, 7 - shot chance]
-    enemies = [[1000, 350, 160, 44, 32, (0, 0), 5, 0.5]]
+    # enemies [0-hp points, 1-x,2-y, 3-length, 4-height, 5-(x, y) heading, 6-speed, 7-shot chance,8-png scr]
+    en_blue = [300, 350, 160, 90, 75, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_blue.png')]
+    en_red = [1000, 350, 160, 90, 75, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_red.png')]
+    en_vader = [1000, 350, 160, 115, 105, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_vader.png')]
+    en_army = [1000, 350, 160, 130, 130, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_army.png')]
+    en_super = [1000, 350, 160, 130, 125, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_super.png')]
+    en_big = [1000, 350, 160, 105, 100, (0, 0), 4, 0.5, pygame.image.load(r'C:\PR\img\chick_big.png')]
+    enemies = [dup_en(en_blue), dup_en(en_red), dup_en(en_army), dup_en(en_big), dup_en(en_vader), dup_en(en_super)]
     sh_lv = 11
     score = 0
 
@@ -153,12 +167,11 @@ def return_of_the_chicken():
                 i[5] = random.randint(10, 750), random.randint(5, 400)
             else:
                 try:
-                    ratio = min(abs(round(5/((vec[0]**2 + vec[1]**2)**0.5), 3)), 1)
+                    ratio = min(abs(round(i[6]/((vec[0]**2 + vec[1]**2)**0.5), 3)), 1)
                     vec = (i[1] + round(vec[0]*ratio), i[2] + round(vec[1]*ratio))
                 except ZeroDivisionError:
                     pass
                 i[1], i[2] = vec
-            print(vec)
 
         scr.fill((0, 0, 0))
         scr.blit(b_g, (0, 0))
@@ -170,7 +183,11 @@ def return_of_the_chicken():
 
         for i in enemies:
             if i[0] > 0:
-                scr.blit(enemy, (i[1], i[2]))
+                scr.blit(i[8], (i[1], i[2]))
+            else:
+                enemies.remove(i)
+        if len(enemies) == 0:
+            enemies = [dup_en(en_blue), dup_en(en_blue), dup_en(en_blue), dup_en(en_blue)]
 
         scr.blit(sp_tr, pos)
 
