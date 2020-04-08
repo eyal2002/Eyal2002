@@ -3,7 +3,8 @@ import socket
 import select
 import random
 
-server_ip = socket.gethostbyname(socket.gethostname())
+# server_ip = socket.gethostbyname(socket.gethostname())
+server_ip = '192.168.1.22'
 
 # ============================================================================================================
 # main function for all stages
@@ -177,6 +178,9 @@ def stage_1(sock):
 # ============================================================================================================
 
 def pop_up(scr, txt, pop_type):
+    """
+    creates a pop up window with a special message
+    """
     # draws the black square
     pg.draw.line(scr, (90, 90, 90), (200, 190), (600, 190), 200)
     # draws one side of the X
@@ -307,6 +311,98 @@ def stage_2_rules():
         pg.display.flip()
         clock.tick(60)
 
+        def stage_2_game():
+            clock = pg.time.Clock()
+            scr = pg.display.set_mode((800, 600))
+
+            # variables
+            done = False
+            popup_active = False
+            wait = True
+            rect_find_game = pg.Rect(390, 50, 250, 100)
+            rect_wait = pg.Rect(350, 300, 330, 100)
+            rect_cancel = pg.Rect(570, 330, 94, 40)
+            bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+            send = pg.image.load(r'C:\PR\img\send.png')
+
+            # need to build a function that get text from the server and convert it to a list.
+            friends = ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd',
+                       'e']
+
+            while not done:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        done = True
+
+                    if event.type == pg.MOUSEBUTTONDOWN:
+
+                        if popup_active:
+
+                            if pg.Rect(290, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
+                                print('accept')
+                                # popup_active = False
+
+                            if pg.Rect(420, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
+                                print('decline')
+                                # popup_active = False
+
+                            if pg.Rect(573, 98, 19, 19).collidepoint(event.pos[0], event.pos[1]):
+                                print('exit popup')
+                                # popup_active = False
+
+                        if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
+                            done = True
+
+                        if rect_find_game.collidepoint(event.pos[0], event.pos[1]):
+                            print('random allay')
+                            wait = True
+
+                        if wait and rect_cancel.collidepoint(event.pos[0], event.pos[1]):
+                            wait = False
+
+                        for i in range(90, 90 + len(friends) * 26, 26):
+                            if pg.Rect(195, i, 32, 22).collidepoint(event.pos[0], event.pos[1]):
+                                active_sh = int((i - 90) / 26)
+                                print(active_sh)
+
+                scr.blit(bg, (0, 0))
+
+                # draws the find a random allay button
+                pg.draw.line(scr, (70, 70, 70), (390, 100), (640, 100), 100)
+                pg.draw.rect(scr, (200, 200, 200), rect_find_game, 4)
+                print_txt(scr, 'Find a Random Allay', 400, 90, 23)
+
+                # prints a return sign
+                pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
+                pg.draw.rect(scr, (200, 200, 200), pg.Rect(0, 0, 80, 40), 5)
+                print_txt(scr, 'Return', 7, 12, 20)
+
+                # draws  the wait sign and the cancel button
+                if wait:
+                    pg.draw.line(scr, (100, 100, 100), (350, 350), (680, 350), 100)
+                    pg.draw.rect(scr, (200, 200, 200), rect_wait, 4)
+                    print_txt(scr, 'Pleas wait', 360, 340, 23)
+                    pg.draw.line(scr, (140, 140, 140), (570, 350), (664, 350), 40)
+                    pg.draw.rect(scr, (230, 230, 230), rect_cancel, 4)
+                    print_txt(scr, 'cancel', 580, 340, 23)
+
+                # makes the structure of the friends list
+                print_txt(scr, 'Active Allies', 38, 58, 20)
+                pg.draw.rect(scr, (200, 200, 200), (30, 50, 200, 506), 4)
+                pg.draw.line(scr, (200, 200, 200), (30, 85), (230, 85), 4)
+
+                # prints an builds the friends and the grid.
+                base_height = 91
+                for friend in friends:
+                    if base_height <= 550:
+                        print_txt(scr, friend, 39, base_height, 18)
+                        pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
+                        scr.blit(send, (195, base_height - 1))
+                        base_height += 26
+
+                pg.display.flip()
+                clock.tick(60)
+
 
 def stage_2_friends():
     clock = pg.time.Clock()
@@ -383,7 +479,7 @@ def stage_2_friends():
         clock.tick(60)
 
 
-def stage_2_main():
+def stage_2_main(sock):
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
 
@@ -401,6 +497,9 @@ def stage_2_main():
 
     # main while loop
     while not done:
+        data = ser_comm(sock)
+        if 'pop' in data:
+            pass
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 done = True
@@ -484,9 +583,10 @@ def main():
     main function, calls the needed functions in order to anabel a correct run of the game
     """
     sock = socket.socket()
-    # sock.connect((server_ip, 8820))
+    sock.connect((server_ip, 8820))
     # print(sock.recv(1024))
-    stage_1(sock)
+    # stage_1(sock)
+    stage_2_main(sock)
 
 
 if __name__ == '__main__':
