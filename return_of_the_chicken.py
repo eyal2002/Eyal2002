@@ -1,10 +1,13 @@
+# C:\PR\return_of_the_chicken.py
 import pygame as pg
 import socket
 import select
 import random
+import sys
 
-# server_ip = socket.gethostbyname(socket.gethostname())
-server_ip = '192.168.1.22'
+server_ip = socket.gethostbyname(socket.gethostname())
+# server_ip = '192.168.1.22'
+# server_ip = '192.168.43.163'
 
 # ============================================================================================================
 # main function for all stages
@@ -87,8 +90,9 @@ def stage_1(sock):
                     # login(text_name, text_pass, sock)
                     sock.send(b'lo si:' + text_name.encode() + b' ' + text_pass.encode())
                     data = sock.recv(1024).decode()
+                    print(data)
                     if data == 'success':
-                        done = True
+                        return text_name, text_pass
                     text_name = ''
                     text_pass = ''
 
@@ -171,13 +175,14 @@ def stage_1(sock):
 
         pg.display.flip()
         clock.tick(60)
+    sys.exit(1)
 
 
 # ============================================================================================================
 # second stage - lobby of the game.
 # ============================================================================================================
 
-def pop_up(scr, txt, pop_type):
+def pop_up(scr, txt):
     """
     creates a pop up window with a special message
     """
@@ -196,10 +201,7 @@ def pop_up(scr, txt, pop_type):
     print_txt(scr, 'Accept', 304, 253, 18)
     print_txt(scr, 'Decline', 430, 254, 18)
     print_txt(scr, txt, 240, 130, 35)
-    if pop_type == 'match':
-        print_txt(scr, 'Invited you to a  match.', 240, 170, 24)
-    elif pop_type == 'friend':
-        print_txt(scr, 'Sent a friend request.', 240, 170, 24)
+    print_txt(scr, 'Invited you to a match.', 240, 170, 24)
 
 
 def ser_comm(sock):
@@ -207,18 +209,23 @@ def ser_comm(sock):
     rlist, wlist, xlist = select.select([sock], [sock], [])
     for current_socket in rlist:
         if current_socket is sock:
-            data = sock.recv(1024).decode()
+            try:
+                data = sock.recv(1024).decode()
+            except ConnectionResetError:
+                sys.exit(1)
     return data
 
 
-def stage_2_custom():
+def stage_2_custom(sock):
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
 
     # variables
     done = False
-    active_sp = 1
-    active_sh = 1
+    sock.send(b'li:get_custom')
+    data = sock.recv(1024).decode()
+    active_sp = int(data[0])
+    active_sh = int(data[2])
     bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
     dice = pg.image.load(r'C:\PR\img\dice.png')
     sp_all = [pg.image.load(r'C:\PR\img\sp_{0}.png'.format(i)) for i in range(1, 8)]
@@ -231,18 +238,20 @@ def stage_2_custom():
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
                     done = True
+                    sock.send('li:set_custom:{0} {1}'.format(active_sp, active_sh).encode())
+                    print(sock.recv(1024).decode())
                 x, y = (20, 100)
-                for sp in sp_all:
+                for i in range(len(sp_all)):
                     if pg.Rect(x, y, 78, 78).collidepoint(event.pos[0], event.pos[1]):
-                        active_sp = (x + 78) / 98
+                        active_sp = int((x + 78) / 98)
                     x += 98
                 if pg.Rect(x, y, 78, 78).collidepoint(event.pos[0], event.pos[1]):
                     active_sp = random.randint(1, 7)
 
                 x, y = (20, 300)
-                for sh in sh_all:
+                for i in range(len(sh_all)):
                     if pg.Rect(x, y, 78, 78).collidepoint(event.pos[0], event.pos[1]):
-                        active_sh = (x + 78) / 98
+                        active_sh = int((x + 78) / 98)
                     x += 98
                 if pg.Rect(x, y, 78, 78).collidepoint(event.pos[0], event.pos[1]):
                     active_sh = random.randint(1, 7)
@@ -285,8 +294,7 @@ def stage_2_rules():
 
     # variables
     done = False
-    page = 1
-    bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+    # page = 1
 
     while not done:
         for event in pg.event.get():
@@ -311,100 +319,8 @@ def stage_2_rules():
         pg.display.flip()
         clock.tick(60)
 
-        def stage_2_game():
-            clock = pg.time.Clock()
-            scr = pg.display.set_mode((800, 600))
 
-            # variables
-            done = False
-            popup_active = False
-            wait = True
-            rect_find_game = pg.Rect(390, 50, 250, 100)
-            rect_wait = pg.Rect(350, 300, 330, 100)
-            rect_cancel = pg.Rect(570, 330, 94, 40)
-            bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
-            send = pg.image.load(r'C:\PR\img\send.png')
-
-            # need to build a function that get text from the server and convert it to a list.
-            friends = ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd',
-                       'e']
-
-            while not done:
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        done = True
-
-                    if event.type == pg.MOUSEBUTTONDOWN:
-
-                        if popup_active:
-
-                            if pg.Rect(290, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
-                                print('accept')
-                                # popup_active = False
-
-                            if pg.Rect(420, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
-                                print('decline')
-                                # popup_active = False
-
-                            if pg.Rect(573, 98, 19, 19).collidepoint(event.pos[0], event.pos[1]):
-                                print('exit popup')
-                                # popup_active = False
-
-                        if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
-                            done = True
-
-                        if rect_find_game.collidepoint(event.pos[0], event.pos[1]):
-                            print('random allay')
-                            wait = True
-
-                        if wait and rect_cancel.collidepoint(event.pos[0], event.pos[1]):
-                            wait = False
-
-                        for i in range(90, 90 + len(friends) * 26, 26):
-                            if pg.Rect(195, i, 32, 22).collidepoint(event.pos[0], event.pos[1]):
-                                active_sh = int((i - 90) / 26)
-                                print(active_sh)
-
-                scr.blit(bg, (0, 0))
-
-                # draws the find a random allay button
-                pg.draw.line(scr, (70, 70, 70), (390, 100), (640, 100), 100)
-                pg.draw.rect(scr, (200, 200, 200), rect_find_game, 4)
-                print_txt(scr, 'Find a Random Allay', 400, 90, 23)
-
-                # prints a return sign
-                pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
-                pg.draw.rect(scr, (200, 200, 200), pg.Rect(0, 0, 80, 40), 5)
-                print_txt(scr, 'Return', 7, 12, 20)
-
-                # draws  the wait sign and the cancel button
-                if wait:
-                    pg.draw.line(scr, (100, 100, 100), (350, 350), (680, 350), 100)
-                    pg.draw.rect(scr, (200, 200, 200), rect_wait, 4)
-                    print_txt(scr, 'Pleas wait', 360, 340, 23)
-                    pg.draw.line(scr, (140, 140, 140), (570, 350), (664, 350), 40)
-                    pg.draw.rect(scr, (230, 230, 230), rect_cancel, 4)
-                    print_txt(scr, 'cancel', 580, 340, 23)
-
-                # makes the structure of the friends list
-                print_txt(scr, 'Active Allies', 38, 58, 20)
-                pg.draw.rect(scr, (200, 200, 200), (30, 50, 200, 506), 4)
-                pg.draw.line(scr, (200, 200, 200), (30, 85), (230, 85), 4)
-
-                # prints an builds the friends and the grid.
-                base_height = 91
-                for friend in friends:
-                    if base_height <= 550:
-                        print_txt(scr, friend, 39, base_height, 18)
-                        pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
-                        scr.blit(send, (195, base_height - 1))
-                        base_height += 26
-
-                pg.display.flip()
-                clock.tick(60)
-
-
-def stage_2_friends():
+def stage_2_friends(sock):
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
 
@@ -417,24 +333,47 @@ def stage_2_friends():
     color_inactive = (120, 120, 255)
     color_active = (90, 90, 255)
     bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
-    search = pg.image.load(r'C:\PR\img\search.png')
+    add_friend = pg.image.load(r'C:\PR\img\add_friend.png')
+    friend_con = False
+    sock.send(b'li:get_all_user')
+    all_users = sock.recv(1024).decode().split()
 
-    # need to build a function that get text from the server and convert it to a list.
-    friends = ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e']
+    sock.send(b'li:get_friends_lobby')
+    friends = sock.recv(1024).decode().split(':')[0].split()
+
+    for name in friends:
+        all_users.remove(name)
 
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 done = True
+
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
                     done = True
-                if pg.Rect(750, 100, 32, 32).collidepoint(event.pos[0], event.pos[1]):
-                    print('search')
+
+                if pg.Rect(750, 100, 32, 32).collidepoint(event.pos[0], event.pos[1]) and friend_con:
+                    sock.send('li:add_friend:{}'.format(text_friend).encode())
+                    print(sock.recv(1024))
+                    sock.send(b'li:get_friends_lobby')
+                    friends = sock.recv(1024).decode().split(':')[0].split()
+                    for name in friends:
+                        all_users.remove(name)
+
                 if input_box.collidepoint(event.pos[0], event.pos[1]):
                     active = not active
+
                 else:
                     active = False
+
+                if len(text_friend) > 0:
+                    base_height = 150
+                    for name in all_users:
+                        if text_friend in name:
+                            if pg.Rect(400, base_height, 250, 30).collidepoint(event.pos[0], event.pos[1]):
+                                text_friend = name
+                            base_height += 30
 
             if event.type == pg.KEYDOWN:
                 if active:
@@ -464,7 +403,14 @@ def stage_2_friends():
         pg.draw.rect(scr, color_active if active else color_inactive, input_box, 2)
 
         # Blit the search icon
-        scr.blit(search, (750, 100))
+        friend_con = False
+        for name in all_users:
+            if name == text_friend:
+                friend_con = True
+                break
+
+        if friend_con:
+            scr.blit(add_friend, (750, 100))
 
         base_height = 91
 
@@ -475,11 +421,125 @@ def stage_2_friends():
                 pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
                 base_height += 26
 
+        base_height = 150
+        if len(text_friend) > 0:
+            for name in all_users:
+                if text_friend in name and base_height < 500:
+                    pg.draw.line(scr, (200, 200, 200), (400, base_height + 8), (650, base_height + 8), 30)
+                    print_txt(scr, name if len(name) < 15 else name[:14], 410, base_height, 20)
+                    base_height += 30
+
         pg.display.flip()
         clock.tick(60)
 
 
-def stage_2_main(sock):
+def stage_2_game(sock, user_name):
+    clock = pg.time.Clock()
+    scr = pg.display.set_mode((800, 600))
+
+    # variables
+    done = False
+    popup_active = False
+    wait = False
+    rect_find_game = pg.Rect(390, 50, 250, 100)
+    rect_wait = pg.Rect(350, 300, 330, 100)
+    rect_cancel = pg.Rect(570, 330, 94, 40)
+    bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
+    send = pg.image.load(r'C:\PR\img\send.png')
+    refresh = pg.image.load(r'C:\PR\img\refresh.png')
+    sock.send(b'li:get_friends_lobby')
+    friends = sock.recv(1024).decode().split(':')[0].split()
+
+    while not done:
+
+        data = ser_comm(sock)
+        if wait and data != 'none':
+            print('game start')
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+
+                if popup_active:
+
+                    if pg.Rect(290, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
+                        print('accept')
+                        popup_active = False
+
+                    if pg.Rect(420, 250, 90, 26).collidepoint(event.pos[0], event.pos[1]):
+                        print('decline')
+                        popup_active = False
+
+                    if pg.Rect(573, 98, 19, 19).collidepoint(event.pos[0], event.pos[1]):
+                        print('exit popup')
+                        popup_active = False
+
+                elif wait and rect_cancel.collidepoint(event.pos[0], event.pos[1]):
+                    wait = False
+
+                else:
+                    if pg.Rect(0, 0, 80, 40).collidepoint(event.pos[0], event.pos[1]):
+                        done = True
+
+                    elif pg.Rect(195, 52, 29, 29).collidepoint(event.pos[0], event.pos[1]):
+                        sock.send('li:get_friends_lobby'.encode())
+                        friends = sock.recv(1024).decode()
+                        friends = friends[:-1].split()
+                        print(friends)
+
+                    if rect_find_game.collidepoint(event.pos[0], event.pos[1]):
+                        sock.send('pl:{0} {1}'.format(socket.gethostbyname(socket.gethostname()), user_name).encode())
+                        wait = True
+
+                    for i in range(90, 90 + len(friends)*26, 26):
+                        if pg.Rect(195, i, 32, 22).collidepoint(event.pos[0], event.pos[1]):
+                            active_sh = int((i - 90) / 26)
+                            print(active_sh)
+
+        scr.blit(bg, (0, 0))
+
+        # draws the find a random allay button
+        pg.draw.line(scr, (70, 70, 70), (390, 100), (640, 100), 100)
+        pg.draw.rect(scr, (200, 200, 200), rect_find_game, 4)
+        print_txt(scr, 'Find a Random Allay', 400, 90, 23)
+
+        # prints a return sign
+        pg.draw.line(scr, (120, 120, 120), (0, 20), (80, 20), 40)
+        pg.draw.rect(scr, (200, 200, 200), pg.Rect(0, 0, 80, 40), 5)
+        print_txt(scr, 'Return', 7, 12, 20)
+
+        # draws  the wait sign and the cancel button
+        if wait:
+            pg.draw.line(scr, (100, 100, 100), (350, 350), (680, 350), 100)
+            pg.draw.rect(scr, (200, 200, 200), rect_wait, 4)
+            print_txt(scr, 'Pleas wait', 360, 340, 23)
+            pg.draw.line(scr, (140, 140, 140), (570, 350), (664, 350), 40)
+            pg.draw.rect(scr, (230, 230, 230), rect_cancel, 4)
+            print_txt(scr, 'cancel', 580, 340, 23)
+
+        # makes the structure of the friends list
+        print_txt(scr, 'Active Allies', 38, 58, 20)
+        pg.draw.rect(scr, (200, 200, 200), (30, 50, 200, 506), 4)
+        pg.draw.line(scr, (200, 200, 200), (30, 85), (230, 85), 4)
+
+        # prints the refresh
+        scr.blit(refresh, (197, 54))
+
+        # prints an builds the friends and the grid.
+        base_height = 91
+        for friend in friends:
+            if base_height <= 550:
+                print_txt(scr, friend, 39, base_height, 18)
+                pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
+                scr.blit(send, (195, base_height - 1))
+                base_height += 26
+
+        pg.display.flip()
+        clock.tick(60)
+
+
+def stage_2_main(sock, user_name):
     clock = pg.time.Clock()
     scr = pg.display.set_mode((800, 600))
 
@@ -491,9 +551,11 @@ def stage_2_main(sock):
     rect_game = pg.Rect(530, 185, 250, 100)
     rect_friends = pg.Rect(530, 315, 250, 100)
     rect_rules = pg.Rect(530, 445, 250, 100)
-    friends_lobby = ['moshe_1', 'moshe_2']
-    friends_mid_game = ['moshe_3', 'moshe_4']
     popup_active = False
+
+    sock.send('li:get_friends_lobby'.encode())
+    friends_lobby = sock.recv(1024).decode()
+    friends_lobby = friends_lobby[:-1].split()
 
     # main while loop
     while not done:
@@ -502,6 +564,8 @@ def stage_2_main(sock):
             pass
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                sock.send(b'exit')
+                print(sock.recv(1024))
                 done = True
 
             if event.type == pg.MOUSEBUTTONDOWN:
@@ -519,19 +583,22 @@ def stage_2_main(sock):
                         # popup_active = False
 
                 elif rect_custom.collidepoint(event.pos[0], event.pos[1]):
-                    stage_2_custom()
+                    stage_2_custom(sock)
 
                 elif rect_game.collidepoint(event.pos[0], event.pos[1]):
-                    print('game')
+                    stage_2_game(sock, user_name)
 
                 elif rect_friends.collidepoint(event.pos[0], event.pos[1]):
-                    stage_2_friends()
+                    stage_2_friends(sock)
 
                 elif rect_rules.collidepoint(event.pos[0], event.pos[1]):
                     stage_2_rules()
 
                 elif pg.Rect(195, 52, 29, 29).collidepoint(event.pos[0], event.pos[1]):
-                    print('refresh')
+                    sock.send('li:get_friends_lobby'.encode())
+                    friends_lobby = sock.recv(1024).decode()
+                    friends_lobby = friends_lobby[:-1].split()
+                    print(friends_lobby)
 
         scr.fill((0, 0, 0))
         scr.blit(bg, (0, 0))
@@ -559,17 +626,8 @@ def stage_2_main(sock):
                 pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
                 base_height += 26
 
-        print_txt(scr, 'Friends In Game:', 39, base_height, 18)
-        pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
-        base_height += 26
-        for friend in friends_mid_game:
-            if base_height <= 524:
-                print_txt(scr, friend, 39, base_height, 18)
-                pg.draw.line(scr, (200, 200, 200), (30, base_height + 22), (230, base_height + 22), 4)
-                base_height += 26
-
         if popup_active:
-            pop_up(scr, '', 'friend')
+            pop_up(scr, '')
 
         pg.display.flip()
         clock.tick(30)
@@ -584,9 +642,9 @@ def main():
     """
     sock = socket.socket()
     sock.connect((server_ip, 8820))
-    # print(sock.recv(1024))
-    # stage_1(sock)
-    stage_2_main(sock)
+    print(sock.recv(1024))
+    user_name, password = stage_1(sock)
+    stage_2_main(sock, user_name)
 
 
 if __name__ == '__main__':

@@ -72,8 +72,7 @@ def sign_in(user_data):
         else:
             print('no')
             current_socket.send(b'fail')
-    except:
-        raise
+    except IndexError:
         print('no')
         current_socket.send(b'fail')
 
@@ -133,16 +132,16 @@ def li_data_handle(user_data):
     print('logged in handler')
     data = user_data[3:].split(':')
     command = data[0]
-    data = data[1]
     conn = sqlite3.connect('PR_DB.db')
     c = conn.cursor()
     print(command)
 
     # sets the players active load-out
     if command == 'set_custom':
-        data = data.split()
+        print(data[1])
+        data[1] = data[1].split()
         c.execute("UPDATE users SET spaceship = '{0}', shot = '{1}' "
-                  "WHERE user_name == '{2}'".format(data[0], data[1], sock_to_name.get(str(current_socket))))
+                  "WHERE user_name == '{2}'".format(data[1][0], data[1][1], sock_to_name.get(str(current_socket))))
         conn.commit()
         current_socket.send(b'done')
         print('sent')
@@ -152,42 +151,59 @@ def li_data_handle(user_data):
         c.execute("SELECT spaceship, shot FROM users WHERE user_name == '{0}'"
                   "".format(sock_to_name.get(str(current_socket))))
         ts = c.fetchall()[0]
+        print('{0} {1}'.format(ts[0], ts[1]))
         current_socket.send('{0} {1}'.format(ts[0], ts[1]).encode())
-        print('sent')
+        print('done')
 
-    elif command == 'get_friends':
-        a_u = name_to_sock.keys()
+    # returns all string with all of the users friends and another one with all of his connected friends
+    elif command == 'get_friends_lobby':
+        a_u = name_to_sock.keys()  # active users
+        print(a_u)
         c.execute("SELECT friends FROM users WHERE user_name == '{0}'".format(sock_to_name.get(str(current_socket))))
         my_friends = c.fetchall()[0][0][:-1]
-        fig = ''
         fil = ''
         connected_users = [sock_to_name.get(user) for user in open_client_sockets]
         for friend in my_friends.split():
             if friend in connected_users:
-                if friend in in_game_users:
-                    fig += friend
-                else:
-                    fil += friend
+                fil += friend
         print('my friends: ' + my_friends)
-        current_socket.send('{0}:{1}:{2}'.format(my_friends, fil, fig).encode())
+        current_socket.send('{0}:{1}'.format(my_friends, fil).encode())
 
+    # adds a user as a friend if he is not in the list already
     elif command == 'add_friend':
         c.execute("SELECT friends FROM users WHERE user_name == '{0}'".format(sock_to_name.get(str(current_socket))))
         my_friends = c.fetchall()
         print(my_friends)
         my_friends = my_friends[0][0]
-        if data not in my_friends.split() or True:
+        print(my_friends)
+        if data[1] not in my_friends.split() or True:
             print('a')
             c.execute("UPDATE users SET friends = '{0}' WHERE user_name == '{1}'"
-                      "".format(my_friends + data + ' ', sock_to_name.get(str(current_socket))))
+                      "".format(my_friends + data[1] + ' ', sock_to_name.get(str(current_socket))))
             conn.commit()
             print('done')
             current_socket.send(b'done')
 
+    # sends all of the current users of the game
     elif command == 'get_c_user':
         msg = ' '.join([name for name in name_to_sock.keys()])
+        msg.replace(sock_to_name.get(str(current_socket)), '')
         print(msg)
-        current_socket.send(msg)
+        current_socket.send(msg.encode())
+
+    # sends all of the user names of the users
+    elif command == 'get_all_user':
+        c.execute("SELECT user_name FROM users")
+        all_users = c.fetchall()
+        all_users.remove((sock_to_name.get(str(current_socket)), ))
+        all_users = ' '.join([name[0] for name in all_users])
+        print(all_users)
+        current_socket.send(all_users.encode())
+
+    # send the invitation to a game to who you requested to among your contacts
+    elif command == 'send_game':
+        data = data[1].split
+        name_to_sock.get(data[1]).send('pop:{0}:{1}'.format(data[0], sock_to_name.get(str(current_socket))))
 
 
 def main():
@@ -216,6 +232,7 @@ def main():
     messages_to_send = []
     name_to_sock = {}
     sock_to_name = {}
+    waiting_player = ''
 
     # main run loop
     while True:
@@ -247,15 +264,26 @@ def main():
                             open_client_sockets.remove(current_socket)
                             current_socket.send(b'disconnected')
 
+                        elif data[:2] == 'pl':
+                            if waiting_player == '':
+                                waiting_player = data.split(':')[1]
+                            else:
+                                current_socket.send(waiting_player.encode())
+                                name_to_sock.get(waiting_player.split()[1]).send(data.split(':')[1].encode())
+
+                        elif data[:6] == 'cancel':
+                            if sock_to_name.get(str(current_socket)) in waiting_player:
+                                waiting_player = ''
+                            else:
+                                name_to_sock.get(data.split(':')).send(b'cancel')
+
                         else:
                             current_socket.send(b'no you')
 
-                    except ConnectionResetError:
+                    except ConnectionResetError or ConnectionAbortedError:
                         print('disconnected')
                         deactivate_user()
-                    except:
-                        raise
-        except:
+        except ConnectionAbortedError:
             print('error - main loop failed')
             raise
         send_waiting_messages(open_client_sockets)
