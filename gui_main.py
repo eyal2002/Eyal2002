@@ -64,7 +64,7 @@ def stage_2_custom():
     bg = pg.image.load(r'C:\PR\img\bg_7.jpg')
     dice = pg.image.load(r'C:\PR\img\dice.png')
     sp_all = [pg.image.load(r'C:\PR\img\sp_{0}.png'.format(i)) for i in range(1, 8)]
-    sh_all = [pg.image.load(r'C:\PR\img\laser_{0}.png'.format(i)) for i in ['b', 'g', 'o', 'r', 'y', 'f', 'ro']]
+    sh_all = [pg.image.load(r'C:\PR\img\laser_{0}.png'.format(i)) for i in range(1, 8)]
 
     while not done:
         for event in pg.event.get():

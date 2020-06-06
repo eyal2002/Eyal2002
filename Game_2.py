@@ -79,7 +79,6 @@ def new_level_enemy(lv):
     en_list = []
 
 
-
 def return_of_the_chicken():
     """
     main game function
